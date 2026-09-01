@@ -1,0 +1,20 @@
+Phase 2 — Deal Pipeline
+Create separate Business Process Flows for all seven business lines, each with customized stages, required fields, and stage-level automation:
+• Tenant Representation
+• Landlord Representation
+• Investment Sales
+• Property Management
+• Development
+• Capital Markets
+• Retail Site Selection & Consulting
+
+
+
+Opportunity Custom Fields
+All deal records should support:
+• Business Line, Property (lookup), Deal Size SF, Lease Term, Sale Price, Cap Rate, Loan Information
+• LOI / Offer Date, Target Close Date, Probability, Pipeline Stage
+• Gross Commission, Net Commission, Expected Commission, Actual Commission
+• Commission calculation method (% of lease value, % of sale price, flat fee, custom schedule)
+• Referral fees, outside broker fees, co-broker fees, house portion, broker portion, adjustments
+• Co-Broker (lookup to Account), Referral Source, Deal Notes

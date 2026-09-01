@@ -1,0 +1,40 @@
+Phase 1 — Contact & Relationship Database
+Contact Entity
+Configure the Contact entity to support CRE relationship management, including:
+• Multiple simultaneous relationship classifications a contact may belong to more than one category:
+◦ Broker, Landlord, Tenant, Investor, Developer, Property Manager, Asset Manager
+◦ Lender, Attorney, Architect, Engineer, Vendor, Consultant, Municipality
+◦ Economic Development, Franchisee, Franchise Development, Owner/User
+◦ General Contractor, Government Agency
+• Professional designation tags searchable and reportable: SIOR, CCIM, ICSC, CRE, CPM, RPA, LEED, NAIOP, ULI, BOMA, MBA, ALC
+• Custom fields: Business Line, Assigned Broker, Markets Served, Geographic Coverage, Target Markets, Property Preferences, Min/Max SF, Lease Expiration Date, Renewal Timeline, Referral Source, Relationship Tier, Last Meaningful Contact, Preferred Communication Method, Social Media Links, Tags
+
+
+
+Account Company Entity
+Configure accounts to support multiple classifications and CRE-specific data:
+• Classifications: Tenant, Landlord, Developer, REIT, Investment Group, Family Office, Franchise, Brokerage, Municipality, Property Owner, Vendor, Lender, Contractor
+• Fields: Portfolio SF, Markets, Industries, NAICS Code, Multiple Office Locations
+• Relationships: Linked contacts, linked properties, ownership relationships
+
+
+
+Custom Entity: Property Record
+Create a custom Property entity with the following field groups:
+• Property Information: Address, County, Market, Submarket, Property Type, Ownership, Broker Assignment, Status
+• Building Information: Building SF, Land Area, Occupancy %, Parking Ratio, Construction Year, Zoning
+• Leasing Information: Available Suites, Lease Rates, Operating Expenses, Tenant Improvements, Leasing Status
+• Ownership: Multiple owners, ownership entities, property managers, asset managers
+• Multi-Tenant Support: Suite numbers, office stacking, retail tenant rosters, lease dates, expiration dates, options, vacancies
+• Relationship views: Property → Tenants, Tenant → Properties, Landlord → Portfolio
+
+
+
+Views & Search Configuration
+Build saved views including:
+• Tenant requirements by SF range searchable/filterable
+• Lease expirations — next 6, 12, and 18 months
+• Stale contacts Last Activity greater 60 days, Tier A or B
+• Available listings by market, submarket, and SF
+• Landlord portfolio by owner/account
+• Contacts by professional designation e.g., all SIOR members
