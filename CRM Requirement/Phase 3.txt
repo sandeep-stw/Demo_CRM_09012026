@@ -1,0 +1,21 @@
+Phase 3 — Outlook-First Workflow (Highest Priority)
+This is our most critical requirement. Brokers must be able to complete everyday CRM tasks without leaving Outlook.
+
+
+
+Capabilities Required
+• Deploy Dynamics 365 App for Outlook to all users (desktop, web, and mobile)
+• Track emails to CRM contact and deal records with one click
+• Create contacts directly from Outlook email signatures
+• Create opportunities directly from emails
+• Associate emails with deals, properties, and companies
+• Schedule meetings and link to CRM records
+• Create follow-up tasks without leaving Outlook
+• View full CRM activity history, related contacts, and open opportunities from the Outlook sidebar
+• Automatic suggestion of matching CRM records for incoming email senders
+
+
+
+Power Automate Flows — Outlook
+• Auto-log accepted calendar events to linked contact and opportunity records
+• Alert broker when email arrives from a sender not in the CRM, with one-click contact creation
