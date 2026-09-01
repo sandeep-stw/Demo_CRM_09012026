@@ -18,7 +18,7 @@ This document defines a Phase 1, Phase 2, and highest-priority Phase 3 implement
 
 - Dynamics 365 Sales is the primary application and Dataverse is the data platform.
 - Standard `Contact`, `Account`, and `Opportunity` tables are extended rather than replaced.
-- The organization will define controlled lists for markets, property types, business lines, statuses, and relationship tiers during configuration.
+- Controlled values use the governance model in Section 4.1; changes are proposed by business owners and deployed by the CRM Administrator.
 - Commission splits are stored as related records because an opportunity can include multiple brokers, referrals, and adjustments.
 
 ## 3. Solution Architecture
@@ -36,25 +36,41 @@ A managed Dataverse solution contains tables, columns, relationships, forms, vie
 
 ## 4. Data Model
 
-### 4.1 Contact
+### 4.1 Controlled Values and Reporting Model
+
+Use global Dataverse choices for stable operational values, reference tables for the market hierarchy, and normalized child records where reporting requires independent filtering or history.
+
+| Domain | Initial values and implementation | Business owner |
+| --- | --- | --- |
+| Business Line | Tenant Representation, Landlord Representation, Investment Sales, Property Management, Development, Capital Markets, Retail Site Selection & Consulting. Global choice. | Sales Operations |
+| Market hierarchy | `Market` and `Submarket` reference tables with an active flag; each Submarket belongs to one Market. | Sales Operations |
+| Property Type | Office, Retail, Industrial, Flex, Medical Office, Multifamily, Land, Hospitality, Mixed Use, and Other. Global choice. | Property Operations |
+| Property Status | Prospect, Active, Available, Partially Available, Fully Leased, Under Contract, Sold, Off Market, and Inactive. Global choice. | Property Operations |
+| Relationship Tier | A, B, C, and D. Global choice. | Sales Operations |
+| Qualifying Activity Type | Completed Meeting, Completed Phone Call, Tracked Email with Response, and Completed Site Tour. Global choice. | Sales Operations |
+| Contact classifications and designations | `Contact Classification` and `Contact Designation` child tables, each linked to Contact and a governed reference value. | Sales Operations and Business Intelligence |
+
+The normalized Contact Classification and Contact Designation tables are the reporting model of record. They support multiple simultaneous values, Dataverse search exposure, Power BI cross-filtering, and effective-date history. The model-driven app presents them as editable subgrids or quick-create controls so users retain a simple data-entry experience.
+
+### 4.2 Contact
 
 Extend `Contact` with:
 
 | Capability | Implementation |
 | --- | --- |
-| Relationship classifications | Multi-select choice: Broker, Landlord, Tenant, Investor, Developer, Property Manager, Asset Manager, Lender, Attorney, Architect, Engineer, Vendor, Consultant, Municipality, Economic Development, Franchisee, Franchise Development, Owner/User, General Contractor, Government Agency. |
-| Professional designations | Multi-select choice: SIOR, CCIM, ICSC, CRE, CPM, RPA, LEED, NAIOP, ULI, BOMA, MBA, ALC. |
+| Relationship classifications | Related `Contact Classification` records: Broker, Landlord, Tenant, Investor, Developer, Property Manager, Asset Manager, Lender, Attorney, Architect, Engineer, Vendor, Consultant, Municipality, Economic Development, Franchisee, Franchise Development, Owner/User, General Contractor, Government Agency. |
+| Professional designations | Related `Contact Designation` records: SIOR, CCIM, ICSC, CRE, CPM, RPA, LEED, NAIOP, ULI, BOMA, MBA, ALC. |
 | Relationship profile | Business Line, Assigned Broker (User lookup), Markets Served, Geographic Coverage, Target Markets, Property Preferences, Min SF, Max SF, Lease Expiration Date, Renewal Timeline, Referral Source, Relationship Tier, Last Meaningful Contact, Preferred Communication Method, Social Media Links, and Tags. |
 
-`Last Meaningful Contact` is updated by a flow when a qualifying completed activity is recorded. Tags may use the platform tag control or a governed custom tag table where reporting needs stricter normalization.
+`Last Meaningful Contact` is updated by a flow when a qualifying completed activity is recorded. Tags use a governed custom tag table to support consistent reporting.
 
-### 4.2 Account (Company)
+### 4.3 Account (Company)
 
 Extend `Account` with a multi-select `Account Classification` choice containing Tenant, Landlord, Developer, REIT, Investment Group, Family Office, Franchise, Brokerage, Municipality, Property Owner, Vendor, Lender, and Contractor. Add Portfolio SF, Markets, Industries, NAICS Code, and a related `Account Location` table for multiple office locations.
 
 Use standard account-contact relationships for linked contacts. Associate accounts to properties using a purpose-based `Property Party` relationship table, which supports ownership entities, managers, and asset managers without limiting a property to one account.
 
-### 4.3 Property and Suite
+### 4.4 Property and Suite
 
 Create custom `Property` and `Suite` tables.
 
@@ -66,7 +82,7 @@ Create custom `Property` and `Suite` tables.
 
 Available Suites hold leasing details and vacancy status. The Suite table is the source of office stacking and retail tenant-roster views; Property presents rollups for available area and occupancy.
 
-### 4.4 Opportunity and Fees
+### 4.5 Opportunity and Fees
 
 Extend `Opportunity` with Business Line, Property (lookup), Deal Size SF, Lease Term, Sale Price, Cap Rate, Loan Information, LOI/Offer Date, Target Close Date, Probability, Pipeline Stage, Gross Commission, Net Commission, Expected Commission, Actual Commission, Commission Calculation Method, Co-Broker (Account lookup), Referral Source, and Deal Notes.
 
@@ -81,7 +97,7 @@ Forms expose relationship subgrids and related tabs:
 - Landlord account/contact: owned and managed portfolio, property parties, and related opportunities.
 - Contact and account: activities, relationship classifications, designations, markets, and property associations.
 
-Enable Dataverse search on contact name, account name, classifications, professional designations, markets, property address, market, submarket, and property type. Searchable/reportable multi-select values must be validated against the organization’s chosen reporting approach; where cross-filtering is insufficient, expose normalized relationship tables in the Power BI model.
+Enable Dataverse search on contact name, account name, classifications, professional designations, markets, property address, market, submarket, and property type. Expose Contact Classification and Contact Designation as related searchable records and include both tables in the Power BI semantic model for cross-filtering.
 
 ### 5.1 Outlook-First Workflow
 
@@ -163,8 +179,6 @@ Views use owner-aware filtering and shared public views. Dashboards use refresh-
 
 ## 10. Open Decisions
 
-- Define values and ownership for Business Line, market hierarchy, property type, status, relationship tier, and qualification activity types.
-- Confirm whether classification/designation values require normalized child tables for Power BI slicing or whether multi-select Dataverse choices meet reporting needs.
 - Confirm source systems, data migration volume, document storage requirements, integration needs, retention policy, and commission-calculation rules.
 - Confirm BPF stage names, required-field rules, approvals, notifications, and SLAs with leaders for each business line.
 - Confirm Outlook tenant prerequisites, supported mobile-client policy, email-tracking rules, record-suggestion matching criteria, mailbox approval ownership, and retention/compliance rules for synchronized email and calendar data.
