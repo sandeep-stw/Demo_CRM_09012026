@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines a Phase 1 and Phase 2 implementation for a commercial real estate (CRE) CRM on Microsoft Dataverse and Dynamics 365 Sales. The solution centralizes relationship data, properties, tenant and landlord activity, and deal pipelines while preserving flexible many-to-many CRE relationships.
+This document defines a Phase 1, Phase 2, and highest-priority Phase 3 implementation for a commercial real estate (CRE) CRM on Microsoft Dataverse and Dynamics 365 Sales. The solution centralizes relationship data, properties, tenant and landlord activity, and deal pipelines while preserving flexible many-to-many CRE relationships.
 
 ## 2. Scope and Assumptions
 
@@ -12,6 +12,7 @@ This document defines a Phase 1 and Phase 2 implementation for a commercial real
 - Saved views, searchable fields, dashboards, and reporting datasets.
 - Seven business-process flows (BPFs) and stage-level automation.
 - Commission and fee capture for opportunities.
+- An Outlook-first workflow through Dynamics 365 App for Outlook and Outlook-triggered Power Automate flows.
 
 ### Assumptions
 
@@ -29,6 +30,7 @@ A managed Dataverse solution contains tables, columns, relationships, forms, vie
 | User experience | Model-driven app with Relationship Management, Properties, Deals, and Reporting work areas. |
 | Data | Standard Contact, Account, Opportunity, Activity, and User tables; custom Property, Suite, Opportunity Fee, and Account Location tables. |
 | Process | One BPF per business line, with stage-gated data and automation through Power Automate. |
+| Outlook experience | Dynamics 365 App for Outlook on desktop, web, and mobile for tracking, creating, associating, and reviewing CRM work without leaving Outlook. |
 | Insights | System views, charts, dashboards, and Power BI semantic model sourced from Dataverse. |
 | Governance | Managed solution deployment, environment variables, role-based security, field audit, and duplicate detection. |
 
@@ -81,6 +83,19 @@ Forms expose relationship subgrids and related tabs:
 
 Enable Dataverse search on contact name, account name, classifications, professional designations, markets, property address, market, submarket, and property type. Searchable/reportable multi-select values must be validated against the organization’s chosen reporting approach; where cross-filtering is insufficient, expose normalized relationship tables in the Power BI model.
 
+### 5.1 Outlook-First Workflow
+
+Deploy Dynamics 365 App for Outlook to all broker users across Outlook desktop, Outlook on the web, and supported mobile clients. The app pane must let users complete the following without leaving Outlook:
+
+- Track an email to the matching contact and deal with one action.
+- Create a contact from an email sender or signature and create an opportunity from an email.
+- Associate emails with opportunities, properties, accounts, and contacts.
+- Schedule or link meetings to CRM records and create follow-up tasks.
+- View the related CRM activity history, contacts, accounts, and open opportunities in the Outlook sidebar.
+- Surface automatic matching-record suggestions for incoming email senders, with user confirmation before association or creation.
+
+Use server-side synchronization and Dataverse email/activity tracking policies appropriate to the organization. Configure mailbox approval, user security privileges, and mobile support before rollout. The Outlook experience reuses standard Contact, Account, Opportunity, Activity, and Appointment records; no duplicate email or calendar data store is introduced.
+
 ## 6. Process Design
 
 ### 6.1 Business Process Flows
@@ -109,6 +124,8 @@ Each BPF requires the business line and property when relevant, target close dat
 | Opportunity fee created or changed | Recalculate expected and net commission totals. |
 | Suite tenant or lease date changed | Refresh property occupancy and availability rollups. |
 | Stale Tier A/B contact | Create owner task after 60 days without meaningful activity. |
+| Accepted calendar event | Auto-log the event to its linked contact and opportunity records. |
+| Email from an unmatched sender | Alert the assigned broker and provide a one-click contact-creation action. |
 
 ## 7. Views, Reporting, and Dashboards
 
@@ -128,10 +145,12 @@ Views use owner-aware filtering and shared public views. Dashboards use refresh-
 
 - Security roles: CRM Administrator, Broker, Broker Manager, Property Manager, Operations, Finance, and Read-Only.
 - Brokers can read shared relationship/property data and update records they own or are assigned; Finance owns commission visibility and updates.
+- Brokers receive the Dynamics 365 App for Outlook privilege and only see CRM records permitted by their Dataverse security role.
 - Enable auditing for ownership, relationship tier, lease dates, pipeline-stage, commission, and fee changes.
 - Configure duplicate detection for contact email, account name plus address, and property address.
 - Use business rules for required fields, date validation, non-negative SF and currency, valid occupancy percentages, and role-specific ownership/fee fields.
 - Deploy as a managed solution from development through test and production, with environment variables for notification recipients and shared-team references.
+- Validate mailbox approval, server-side synchronization, data-loss-prevention policy, and supported Outlook clients before deployment.
 
 ## 9. Delivery Plan and Acceptance Criteria
 
@@ -139,6 +158,7 @@ Views use owner-aware filtering and shared public views. Dashboards use refresh-
 | --- | --- | --- |
 | Phase 1 | Contact and account extensions, Property/Suite/Property Party tables, forms, views, search, security baseline. | Users can classify contacts/accounts multiple ways, manage owners/managers/tenants, maintain suite rosters and lease dates, and execute every requested saved view. |
 | Phase 2 | Opportunity extensions, Opportunity Fee, seven BPFs, stage automation, commission reporting. | Users can run the correct BPF by business line, meet stage requirements, manage all requested deal and fee data, and report expected/actual commissions. |
+| Phase 3 (highest priority) | Dynamics 365 App for Outlook rollout, Outlook email/calendar/task workflows, matching suggestions, and Outlook-triggered flows. | Brokers can track and associate email, create contacts/opportunities/tasks, schedule and link meetings, and review CRM context from Outlook desktop, web, and mobile; accepted events and unmatched senders trigger the specified automation. |
 | UAT | Scenario scripts, migration validation, role testing, performance testing, and training. | Named business owners approve each business line, all view totals reconcile to source records, and no high-severity defects remain. |
 
 ## 10. Open Decisions
@@ -147,3 +167,4 @@ Views use owner-aware filtering and shared public views. Dashboards use refresh-
 - Confirm whether classification/designation values require normalized child tables for Power BI slicing or whether multi-select Dataverse choices meet reporting needs.
 - Confirm source systems, data migration volume, document storage requirements, integration needs, retention policy, and commission-calculation rules.
 - Confirm BPF stage names, required-field rules, approvals, notifications, and SLAs with leaders for each business line.
+- Confirm Outlook tenant prerequisites, supported mobile-client policy, email-tracking rules, record-suggestion matching criteria, mailbox approval ownership, and retention/compliance rules for synchronized email and calendar data.
